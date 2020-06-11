@@ -5,10 +5,20 @@ import { UploadOutlined } from "@ant-design/icons";
 import "antd/dist/antd.css";
 import Tiles from "./Tiles";
 
+const MAX_COMBINATIONS = 9;
+const getMarks = (max: number) =>
+  Array.from(new Array(max).keys()).reduce(
+    (marks, key) => ({ ...marks, [key + 1]: key + 1 }),
+    {}
+  );
+
 function App() {
   const [imgSrc, setImgSrc] = useState<string>();
-  const [motifWidth, setMotifWidth] = useState<number>();
-  const [motifHeight, setMotifHeight] = useState<number>();
+  const [motifWidth, setMotifWidth] = useState<number>(1);
+  const [motifHeight, setMotifHeight] = useState<number>(1);
+
+  const maxWidth = Math.floor(MAX_COMBINATIONS / motifHeight);
+  const maxHeight = Math.floor(MAX_COMBINATIONS / motifWidth);
 
   return (
     <div>
@@ -36,10 +46,10 @@ function App() {
         </Form.Item>
         <Form.Item label="Pattern width">
           <Slider
-            style={{ width: 80 }}
+            style={{ width: 120 }}
             min={1}
-            max={4}
-            marks={{ 1: "1", 2: "2", 3: "3", 4: "4" }}
+            max={maxWidth}
+            marks={getMarks(maxWidth)}
             onChange={(value) => {
               setMotifWidth(value as any);
             }}
@@ -47,10 +57,10 @@ function App() {
         </Form.Item>
         <Form.Item label="Pattern height">
           <Slider
-            style={{ width: 80 }}
+            style={{ width: 120 }}
             min={1}
-            max={4}
-            marks={{ 1: "1", 2: "2", 3: "3", 4: "4" }}
+            max={maxHeight}
+            marks={getMarks(maxHeight)}
             onChange={(value) => {
               setMotifHeight(value as any);
             }}
