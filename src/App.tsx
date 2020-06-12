@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, ReactNode } from "react";
 import "./App.css";
-import { Form, Slider, Upload, Button } from "antd";
+import { Form, Slider, Upload, Button, Radio } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import "antd/dist/antd.css";
 import Tiles from "./Tiles";
+import Tile from "./Tile";
 
 const MAX_COMBINATIONS = 9;
 const getMarks = (max: number) =>
@@ -11,14 +12,82 @@ const getMarks = (max: number) =>
     (marks, key) => ({ ...marks, [key + 1]: key + 1 }),
     {}
   );
+const randomIntFromInterval = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1) + min);
 
 function App() {
+  const rowsCount = 12;
+  const columnsCount = 8;
+
   const [imgSrc, setImgSrc] = useState<string>();
+  const [mode, setMode] = useState<string>("patterns");
   const [motifWidth, setMotifWidth] = useState<number>(1);
   const [motifHeight, setMotifHeight] = useState<number>(1);
+  const [, updateState] = React.useState();
 
   const maxWidth = Math.floor(MAX_COMBINATIONS / motifHeight);
   const maxHeight = Math.floor(MAX_COMBINATIONS / motifWidth);
+
+  let commands: ReactNode;
+  let content: ReactNode;
+  if (mode === "patterns") {
+    commands = [
+      <Form.Item key="width" label="Pattern width">
+        <Slider
+          style={{ width: 120 }}
+          min={1}
+          max={maxWidth}
+          marks={getMarks(maxWidth)}
+          onChange={(value) => {
+            setMotifWidth(value as any);
+          }}
+        />
+      </Form.Item>,
+      <Form.Item key="height" label="Pattern height">
+        <Slider
+          style={{ width: 120 }}
+          min={1}
+          max={maxHeight}
+          marks={getMarks(maxHeight)}
+          onChange={(value) => {
+            setMotifHeight(value as any);
+          }}
+        />
+      </Form.Item>,
+    ];
+
+    content = (
+      <Tiles
+        rowsCount={rowsCount}
+        columnsCount={columnsCount}
+        imgSrc={imgSrc}
+        motifWidth={motifWidth}
+        motifHeight={motifHeight}
+      />
+    );
+  } else {
+    commands = (
+      <Form.Item>
+        <Button
+          style={{ margin: 5 }}
+          type="primary"
+          onClick={() => updateState({})}
+        >
+          Generate
+        </Button>
+      </Form.Item>
+    );
+
+    content = [1, 2, 3].map((index) => (
+      <Tile
+        rowsCount={rowsCount}
+        columnsCount={columnsCount}
+        imgSrc={imgSrc}
+        legend={`Random ${index}`}
+        getPosition={() => randomIntFromInterval(0, 3)}
+      />
+    ));
+  }
 
   return (
     <div>
@@ -39,39 +108,27 @@ function App() {
               return false;
             }}
           >
-            <Button>
+            <Button style={{ margin: 5 }}>
               <UploadOutlined /> Upload Tile
             </Button>
           </Upload>
         </Form.Item>
-        <Form.Item label="Pattern width">
-          <Slider
-            style={{ width: 120 }}
-            min={1}
-            max={maxWidth}
-            marks={getMarks(maxWidth)}
+        <Form.Item>
+          <Radio.Group
+            value={mode}
             onChange={(value) => {
-              setMotifWidth(value as any);
+              setMode(value.target.value);
             }}
-          />
+            size="small"
+            style={{ margin: 5 }}
+          >
+            <Radio.Button value="patterns">Patterns</Radio.Button>
+            <Radio.Button value="random">Random</Radio.Button>
+          </Radio.Group>
         </Form.Item>
-        <Form.Item label="Pattern height">
-          <Slider
-            style={{ width: 120 }}
-            min={1}
-            max={maxHeight}
-            marks={getMarks(maxHeight)}
-            onChange={(value) => {
-              setMotifHeight(value as any);
-            }}
-          />
-        </Form.Item>
+        {commands}
       </Form>
-      <Tiles
-        imgSrc={imgSrc}
-        motifWidth={motifWidth}
-        motifHeight={motifHeight}
-      />
+      {content}
     </div>
   );
 }

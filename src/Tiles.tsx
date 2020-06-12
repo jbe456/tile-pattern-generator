@@ -2,22 +2,24 @@ import React, { CSSProperties } from "react";
 import Combinatorics from "js-combinatorics";
 import { AutoSizer, List } from "react-virtualized";
 import { getKey, getTranslations } from "./utils";
+import Tile from "./Tile";
 
 function Tiles({
+  rowsCount,
+  columnsCount,
   motifWidth,
   motifHeight,
   imgSrc,
 }: {
+  rowsCount: number;
+  columnsCount: number;
   imgSrc: string;
   motifWidth: number;
   motifHeight: number;
 }) {
   const imgSize = 30;
-  const rowsCount = 12;
   const imgMargin = 10;
 
-  const rows = Array.from(Array(rowsCount).keys());
-  const columns = Array.from(Array(8).keys());
   const positions = [0, 1, 2, 3];
 
   const linePatterns = Combinatorics.baseN(positions, motifWidth).toArray();
@@ -56,38 +58,17 @@ function Tiles({
     style: CSSProperties;
   }) => (
     <div key={key} style={style}>
-      <div
-        style={{
-          margin: imgMargin,
-          position: "relative",
-          float: "left",
-        }}
-      >
-        № {index}
-        {rows.map((row) => {
-          return (
-            <div key={row} style={{ height: imgSize }}>
-              {columns.map((column) => {
-                return (
-                  <img
-                    alt=""
-                    key={column}
-                    src={imgSrc}
-                    style={{
-                      width: imgSize,
-                      transform: `rotate(${
-                        worldOfPossible[index][row % motifHeight][
-                          column % motifWidth
-                        ] * 90
-                      }deg)`,
-                    }}
-                  />
-                );
-              })}
-            </div>
-          );
-        })}
-      </div>
+      <Tile
+        rowsCount={rowsCount}
+        columnsCount={columnsCount}
+        imgSrc={imgSrc}
+        legend={`№ ${index}`}
+        getPosition={(coordinate) =>
+          worldOfPossible[index][coordinate.row % motifHeight][
+            coordinate.column % motifWidth
+          ]
+        }
+      />
     </div>
   );
 
