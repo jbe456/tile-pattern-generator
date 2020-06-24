@@ -2,11 +2,12 @@
 
 Generate all possible combinations of tiles by rotating each by 90 degrees for a specific pattern size.
 
+[Try it live](https://jbe456.github.io/tile-pattern-generator/)
+
 ![](./preview.png)
 
 ### Next steps
 
-- publish on github.io
 - add math calculations
 
 ## Available Scripts
